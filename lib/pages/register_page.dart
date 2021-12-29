@@ -1,8 +1,11 @@
+import 'package:chat/helpers/mostrar_alerta.dart';
+import 'package:chat/services/auth_service.dart';
 import 'package:chat/widgets/widgets.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:provider/provider.dart';
 
 class RegisterPage extends StatelessWidget {
 
@@ -54,6 +57,9 @@ class _FormState extends State<_Form> {
 
   @override
   Widget build(BuildContext context) {
+
+    final authService = Provider.of<AuthService>(context);
+
     return Container(
       margin: const EdgeInsets.only(top: 40),
       padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 50.0),
@@ -78,9 +84,16 @@ class _FormState extends State<_Form> {
             isPassword: true,
           ),
           BotonAzul(
-            callback: () {
-              print(emailCtrl.text);
-              print(passCtrl.text);
+            callback: authService.autenticando?
+              null
+              :
+              () async {
+              final band = await authService.register(nombreCtrl.text.trim(), emailCtrl.text.trim(), passCtrl.text.trim());
+              if(band == true){
+                Navigator.pushReplacementNamed(context, 'usuarios');
+              }else{
+                mostarAlerta(context, 'Campo inválido', band);
+              }
             },
             texto: "Ingresar",
           )

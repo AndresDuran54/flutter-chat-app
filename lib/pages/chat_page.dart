@@ -8,7 +8,7 @@ class ChatPage extends StatefulWidget {
 
   @override
   State<ChatPage> createState() => _ChatPageState();
-}
+}  
 
 class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin{
 
@@ -142,6 +142,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin{
     _textController.clear();
   }
 
+  //Se llama cuando este objeto se elimina del árbol de forma permanente.
   @override
   void dispose() {
     // TODO: off del socket

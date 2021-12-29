@@ -1,8 +1,11 @@
+import 'package:chat/helpers/mostrar_alerta.dart';
+import 'package:chat/services/auth_service.dart';
 import 'package:chat/widgets/widgets.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatelessWidget {
 
@@ -53,6 +56,8 @@ class _FormState extends State<_Form> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context, listen: false);
+    
     return Container(
       margin: const EdgeInsets.only(top: 40),
       padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 50.0),
@@ -71,8 +76,18 @@ class _FormState extends State<_Form> {
             isPassword: true,
           ),
           BotonAzul(
-            callback: () {
-              
+            callback: authService.autenticando?
+              null
+              :
+              () async {
+              //https://api.flutter.dev/flutter/widgets/FocusScope-class.html
+              FocusScope.of(context).unfocus();
+              bool band = await authService.login(emailCtrl.text.trim(), passCtrl.text.trim());
+              if(band){
+                Navigator.pushReplacementNamed(context, 'usuarios');
+              }else{
+                mostarAlerta(context, 'Login incorrecto', 'Revice sus credenciales');
+              }
             },
             texto: "Ingresar",
           )

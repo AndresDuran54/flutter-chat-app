@@ -15,6 +15,7 @@ class BotonAzul extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialButton(
+      disabledColor: Colors.grey,
       color: Colors.blueAccent,
       elevation: 2,
       shape: const StadiumBorder(),
