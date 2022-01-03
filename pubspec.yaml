@@ -30,10 +30,11 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter:
     sdk: flutter
-  flutter_secure_storage: ^5.0.2
+  flutter_secure_storage: ^4.2.1
   http: ^0.13.4
   provider: ^6.0.1
   pull_to_refresh: ^2.0.0
+  socket_io_client: ^1.0.2
 
 dev_dependencies:
   flutter_lints: ^1.0.0

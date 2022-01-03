@@ -1,8 +1,14 @@
+import 'dart:developer';
 import 'dart:io';
 
+import 'package:chat/models/mensajes_resp.dart';
+import 'package:chat/services/auth_service.dart';
+import 'package:chat/services/chat_service.dart';
+import 'package:chat/services/socket_service.dart';
 import 'package:chat/widgets/chat_mesage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ChatPage extends StatefulWidget {
 
@@ -14,25 +20,88 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin{
 
   final TextEditingController _textController = TextEditingController();
   final FocusNode _focusNode =  FocusNode();
-
   final List<ChatMessage> _messages = [
   ];
-
   bool _estaEscribiendo = false;
+
+  //Servicios
+  late SocketService socketService;
+  late ChatService chatService;
+  late AuthService authService;
+
+  @override
+  void initState() {
+    socketService = Provider.of<SocketService>(context, listen: false); 
+    chatService = Provider.of<ChatService>(context, listen: false);
+    authService = Provider.of<AuthService>(context, listen: false);
+
+    //Indicamos al socket que escuche el evento mensaje-privado
+    //y asignamos el callback
+    socketService.socket.on('mensaje-privado', _recibirMensaje);
+
+    _obtenerMensajes();
+
+    super.initState();
+  }
+
+  Future<void> _obtenerMensajes() async{
+
+    List<Mensaje> mensajes = await chatService.obtenerMensajes();
+
+    mensajes = List.from(mensajes.reversed);
+
+    final hystori = mensajes.map((m) => ChatMessage(
+      text: m.mensaje, 
+      uid: m.de, 
+      animationController: AnimationController(
+          vsync: this,
+          duration: const Duration(milliseconds: 0)
+        )..forward(),
+      )
+    );
+
+    _messages.insertAll(0, hystori);
+  
+    setState(() {
+      
+    });
+  }
+
+  _recibirMensaje(dynamic payload){
+
+    log(payload);
+
+    final newMessage = ChatMessage(
+      text: payload["mensaje"], 
+      uid: payload["de"],
+      animationController: AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 200)
+      ),
+    );
+
+    setState(() {
+      _messages.insert(0, newMessage);
+    });
+
+    newMessage.animationController.forward();
+
+  }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Column(
-          children: const <Widget>[
+          children: <Widget>[
             CircleAvatar(
-              child: Text('An'),
+              child: Text(chatService.usuarioPara.nombre.substring(0,2)),
               maxRadius: 13,
             ),
-            SizedBox(height: 3),
-            Text('Andrés Duran Ccota', style: TextStyle(color: Colors.black))
+            const SizedBox(height: 3),
+            Text(chatService.usuarioPara.nombre, style: TextStyle(color: Colors.black))
           ],
         ),
         centerTitle: true,
@@ -127,7 +196,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin{
 
     final newMessage = ChatMessage(
       text: texto, 
-      uid: '123',
+      uid: authService.usuario.uid,
       animationController: AnimationController(
         vsync: this,
         duration: const Duration(milliseconds: 200)
@@ -138,6 +207,14 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin{
     setState(() {
       _estaEscribiendo = false;
     });
+
+    //Emitimos el evento mensaje-privado al servidor
+    socketService.socket.emit('mensaje-privado', {
+      "de": authService.usuario.uid,
+      "para": chatService.usuarioPara.uid,
+      "mensaje": texto 
+    });
+
     _focusNode.requestFocus();
     _textController.clear();
   }
@@ -145,10 +222,14 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin{
   //Se llama cuando este objeto se elimina del árbol de forma permanente.
   @override
   void dispose() {
-    // TODO: off del socket
+
     for( ChatMessage message in _messages ){
       message.animationController.dispose();
     }
+
+    //Dejamos de escuchar al evento mensaje-privado
+    socketService.socket.off('mensaje-privado');
+
     super.dispose();
   }
 }

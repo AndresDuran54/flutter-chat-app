@@ -1,5 +1,6 @@
 import 'package:chat/helpers/mostrar_alerta.dart';
 import 'package:chat/services/auth_service.dart';
+import 'package:chat/services/socket_service.dart';
 import 'package:chat/widgets/widgets.dart';
 
 import 'package:flutter/cupertino.dart';
@@ -59,6 +60,7 @@ class _FormState extends State<_Form> {
   Widget build(BuildContext context) {
 
     final authService = Provider.of<AuthService>(context);
+    final socketService = Provider.of<SocketService>(context);
 
     return Container(
       margin: const EdgeInsets.only(top: 40),
@@ -90,6 +92,7 @@ class _FormState extends State<_Form> {
               () async {
               final band = await authService.register(nombreCtrl.text.trim(), emailCtrl.text.trim(), passCtrl.text.trim());
               if(band == true){
+                socketService.connect();
                 Navigator.pushReplacementNamed(context, 'usuarios');
               }else{
                 mostarAlerta(context, 'Campo inválido', band);

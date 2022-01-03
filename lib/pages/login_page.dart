@@ -1,5 +1,6 @@
 import 'package:chat/helpers/mostrar_alerta.dart';
 import 'package:chat/services/auth_service.dart';
+import 'package:chat/services/socket_service.dart';
 import 'package:chat/widgets/widgets.dart';
 
 import 'package:flutter/cupertino.dart';
@@ -57,41 +58,46 @@ class _FormState extends State<_Form> {
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context, listen: false);
+    final socketService = Provider.of<SocketService>(context, listen: false);
+
     
-    return Container(
-      margin: const EdgeInsets.only(top: 40),
-      padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 50.0),
-      child: Column(
-        children: <Widget>[
-          CustomInput(
-            icon: Icons.mail_outlined,
-            placeholder: 'Correo',
-            keyboardType: TextInputType.emailAddress,
-            textController: emailCtrl,
-          ),
-          CustomInput(
-            icon: Icons.lock_outline, 
-            placeholder: "Password", 
-            textController: passCtrl,
-            isPassword: true,
-          ),
-          BotonAzul(
-            callback: authService.autenticando?
-              null
-              :
-              () async {
-              //https://api.flutter.dev/flutter/widgets/FocusScope-class.html
-              FocusScope.of(context).unfocus();
-              bool band = await authService.login(emailCtrl.text.trim(), passCtrl.text.trim());
-              if(band){
-                Navigator.pushReplacementNamed(context, 'usuarios');
-              }else{
-                mostarAlerta(context, 'Login incorrecto', 'Revice sus credenciales');
-              }
-            },
-            texto: "Ingresar",
-          )
-        ],
+    return SingleChildScrollView(
+      child: Container(
+        margin: const EdgeInsets.only(top: 40),
+        padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 50.0),
+        child: Column(
+          children: <Widget>[
+            CustomInput(
+              icon: Icons.mail_outlined,
+              placeholder: 'Correo',
+              keyboardType: TextInputType.emailAddress,
+              textController: emailCtrl,
+            ),
+            CustomInput(
+              icon: Icons.lock_outline, 
+              placeholder: "Password", 
+              textController: passCtrl,
+              isPassword: true,
+            ),
+            BotonAzul(
+              callback: authService.autenticando?
+                null
+                :
+                () async {
+                //https://api.flutter.dev/flutter/widgets/FocusScope-class.html
+                FocusScope.of(context).unfocus();
+                bool band = await authService.login(emailCtrl.text.trim(), passCtrl.text.trim());
+                if(band){
+                  socketService.connect();
+                  Navigator.pushReplacementNamed(context, 'usuarios');
+                }else{
+                  mostarAlerta(context, 'Login incorrecto', 'Revice sus credenciales');
+                }
+              },
+              texto: "Ingresar",
+            )
+          ],
+        ),
       ),
     );
   }
