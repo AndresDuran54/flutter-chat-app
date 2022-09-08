@@ -69,7 +69,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin{
 
   _recibirMensaje(dynamic payload){
 
-    log(payload);
+    log("_recibirMensaje");
 
     final newMessage = ChatMessage(
       text: payload["mensaje"], 

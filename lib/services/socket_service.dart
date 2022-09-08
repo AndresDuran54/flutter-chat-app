@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:chat/services/auth_service.dart';
 import 'package:flutter/material.dart';
 
@@ -22,8 +24,7 @@ class SocketService with ChangeNotifier {
   void connect() async {
 
     final token = await AuthService.getToken();
-
-    _socket = IO.io('http://192.168.1.4:3000/', {
+    _socket = IO.io('http://192.168.1.8:3000/', {
       'transports': ['websocket'],
       //Ya sea para conectarse automáticamente al momento de la creación. Si se establece en falso, debe conectarse manualmente:
       /*
@@ -41,7 +42,8 @@ class SocketService with ChangeNotifier {
       'extraHeaders': {
         'x-token': token
       }
-    }); 
+    });
+    log("_socket");
 
     _socket.on('connect', (_) {
       _serverStatus = ServerStatus.Online;

@@ -59,7 +59,6 @@ class AuthService with ChangeNotifier{
       final loginResponse = loginResponseFromJson(resp.body);
       usuario = loginResponse.usuario;
       await _guardarToken(loginResponse.token);
-      log(await AuthService.getToken());
       return true;
     }else{
       return false;
@@ -124,7 +123,7 @@ class AuthService with ChangeNotifier{
     }
   }
 
-  _guardarToken (String token) async {
+  _guardarToken(String token) async {
     await _storage.write(key: 'token', value: token);
   }
 

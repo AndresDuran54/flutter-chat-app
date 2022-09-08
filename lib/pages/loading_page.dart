@@ -11,25 +11,23 @@ class LoadingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: checkLoginState(context),
-      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) { 
-        return const Center(
-          child: CircularProgressIndicator()
-        );
-      },
-
+    return Scaffold(
+      body: FutureBuilder(
+        future: checkLoginState(context),
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) { 
+          return const Center(
+            child: CircularProgressIndicator()
+          );
+        },
+      ),
     );
   }
 
   Future<void> checkLoginState(BuildContext context) async{
-
-    final authService = Provider.of<AuthService>(context);
-    final socketService = Provider.of<SocketService>(context);
+    final authService = Provider.of<AuthService>(context, listen: false);
+    final socketService = Provider.of<SocketService>(context, listen: false);
 
     final band = await authService.isLoggedIn();
-
-    log('$band');
 
     if(band){
       socketService.connect();
