@@ -1,8 +1,7 @@
 SELECT * FROM Orders O INNER JOIN [Order Details] OD on O.OrderID = OD.OrderID inner join Products P on OD.ProductID = P.ProductID INNER JOIN Categories C on C.CategoryID = P.CategoryID
 INNER JOIN Employees E on E.EmployeeID = O.EmployeeID INNER JOIN Customers CU on CU.CustomerID = O.CustomerID;
 
-
-Clientes con mayor gasto:
+-- Clientes con mayor gasto:
 
 SELECT TOP 5
     C.CustomerID,
@@ -19,7 +18,7 @@ ORDER BY
     SUM(OD.Quantity * OD.UnitPrice) DESC;
     
     
- Empleado con más ventas:
+-- Empleado con más ventas:
 
 SELECT TOP 1
     E.EmployeeID,
@@ -36,7 +35,7 @@ GROUP BY
 ORDER BY
     SUM(OD.Quantity * OD.UnitPrice) DESC;
     
-   Total de ventas por categoría:
+-- Total de ventas por categoría:
 
 SELECT
     C.CategoryName,
@@ -52,7 +51,7 @@ ORDER BY
     SUM(OD.Quantity * OD.UnitPrice) DESC;
     
     
- Clientes con más órdenes:
+-- Clientes con más órdenes:
 
 SELECT TOP 5
     C.CustomerID,
@@ -68,7 +67,7 @@ ORDER BY
     COUNT(*) DESC;
     
     
-  Producto más vendido:
+-- Producto más vendido:
 
 SELECT TOP 1
     P.ProductName,
@@ -83,7 +82,7 @@ ORDER BY
     SUM(OD.Quantity) DESC;
     
     
-    Resumen de ventas por mes:
+-- Resumen de ventas por mes:
 
 SELECT
     YEAR(OrderDate) AS Year,
